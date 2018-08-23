@@ -1,0 +1,8 @@
+.idea
+.vagrant
+/.buildpath
+/.project
+/.settings
+/nbproject
+/vendor
+Vagrantfile

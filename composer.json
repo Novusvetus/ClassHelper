@@ -1,0 +1,15 @@
+{
+    "name": "novusvetus/classhelper",
+    "description": "Some class helper.",
+    "authors": [
+        {
+            "name": "Novusvetus / Marcel Rudolf, Germany",
+            "email": "development@novusvetus.de"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Novusvetus\\ClassHelper\\": "src/"
+        }
+    }
+}
