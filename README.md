@@ -1,0 +1,2 @@
+# ClassHelper
+Some class helper.
