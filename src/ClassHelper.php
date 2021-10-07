@@ -33,7 +33,7 @@ class ClassHelper
      *
      * @return bool Returns true, if everything was okay
      */
-    public static function useOverwriteClass($oldClass, $newClass, $force = false)
+    public static function useOverwriteClass($oldClass, $newClass, $force = false): bool
     {
         if (self::exists($newClass)) {
             if (($force) || (is_a(self::singleton($oldClass), $newClass))) {
@@ -54,7 +54,7 @@ class ClassHelper
      *
      * @return bool
      */
-    public static function exists($class)
+    public static function exists($class): bool
     {
         return (class_exists($class, false) || interface_exists($class, false));
     }
@@ -67,7 +67,7 @@ class ClassHelper
      *
      * @return static The singleton instance
      */
-    public static function singleton($class = null)
+    public static function singleton($class = null): ClassHelper
     {
         if (!$class) {
             $class = get_called_class();
@@ -92,7 +92,7 @@ class ClassHelper
      *
      * @return static
      */
-    public static function create()
+    public static function create(): ClassHelper
     {
         $args = func_get_args();
 
@@ -118,7 +118,7 @@ class ClassHelper
      * @return string the class that would be created if you called
      * {@link ClassHelper::create()} with the class
      */
-    public static function getOverwriteClass($class)
+    public static function getOverwriteClass($class): string
     {
         if (isset(self::$overwriteClasses[$class])) {
             return self::$overwriteClasses[$class];
@@ -141,7 +141,7 @@ class ClassHelper
      * @return mixed The value of the static property $name on class $class,
      * or $default if that property is not defined
      */
-    public static function static_lookup($class, $name, $default = null)
+    public static function staticLookup($class, $name, $default = null): mixed
     {
         $reflection = new ReflectionClass($class);
         $static_properties = $reflection->getStaticProperties();
@@ -170,7 +170,7 @@ class ClassHelper
      *
      * @return string this classes parent class
      */
-    public function parentClass()
+    public function parentClass(): mixed
     {
         return get_parent_class($this);
     }
@@ -183,7 +183,7 @@ class ClassHelper
      *
      * @return bool
      */
-    public function is_a($class)
+    public function isA($class): bool
     {
         return $this instanceof $class;
     }
@@ -193,7 +193,7 @@ class ClassHelper
      *
      * @return string the class name
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->class;
     }
@@ -203,7 +203,7 @@ class ClassHelper
      *
      * @return string the class name
      */
-    public function getClass()
+    public function getClass(): string
     {
         return get_class($this);
     }
