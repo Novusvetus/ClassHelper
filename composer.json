@@ -1,15 +1,23 @@
 {
-    "name": "novusvetus/classhelper",
-    "description": "Some class helper.",
-    "authors": [
-        {
-            "name": "Novusvetus / Marcel Rudolf, Germany",
-            "email": "development@novusvetus.de"
-        }
-    ],
-    "autoload": {
-        "psr-4": {
-            "Novusvetus\\ClassHelper\\": "src/"
-        }
+  "name": "novusvetus/classhelper",
+  "description": "Some class helper.",
+  "license": "BSD-3-Clause",
+  "authors": [
+    {
+      "name": "Novusvetus / Marcel Rudolf, Germany",
+      "email": "development@novusvetus.de"
     }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Novusvetus\\ClassHelper\\": "src/"
+    }
+  },
+  "require": {
+    "php": "^7.1 || ^8"
+  },
+  "config": {
+    "process-timeout": 600,
+    "sort-packages": true
+  }
 }

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  * This file is part of ClassHelper.
@@ -22,6 +22,65 @@ class ClassHelper
     private static $singletons = array();
 
     /**
+     * This class allows you to overload classes with other classes when they
+     * are constructed using the factory method
+     * {@link ClassHelper::create()}
+     *
+     * @param string $oldClass the class to replace
+     * @param string $newClass the class to replace it with
+     * @param bool $force When true, the new class don't need to be a child
+     * class of the old
+     *
+     * @return bool Returns true, if everything was okay
+     */
+    public static function useOverwriteClass($oldClass, $newClass, $force = false): bool
+    {
+        if (self::exists($newClass)) {
+            if (($force) || (is_a(self::singleton($oldClass), $newClass))) {
+                self::$overwriteClasses[$oldClass] = $newClass;
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Returns true if a class or interface name exists.
+     *
+     * @param string $class
+     *
+     * @return bool
+     */
+    public static function exists($class): bool
+    {
+        return (class_exists($class, false) || interface_exists($class, false));
+    }
+
+    /**
+     * Creates a class instance by the "singleton" design pattern.
+     * It will always return the same instance for this class.
+     *
+     * @param string $class Optional classname to create, if the called class should not be used
+     *
+     * @return static The singleton instance
+     */
+    public static function singleton($class = null): ClassHelper
+    {
+        if (!$class) {
+            $class = get_called_class();
+        }
+
+        if (!isset(self::$singletons[$class])) {
+            self::$singletons[$class] = self::create($class);
+        }
+
+        return self::$singletons[$class];
+    }
+
+    /**
      * The factory method, allows you to create an instance of a class.
      *
      * This can be called in two ways - calling via the class directly,
@@ -33,7 +92,7 @@ class ClassHelper
      *
      * @return static
      */
-    public static function create()
+    public static function create(): ClassHelper
     {
         $args = func_get_args();
 
@@ -51,65 +110,6 @@ class ClassHelper
     }
 
     /**
-     * Creates a class instance by the "singleton" design pattern.
-     * It will always return the same instance for this class.
-     *
-     * @param string $class Optional classname to create, if the called class should not be used
-     *
-     * @return static The singleton instance
-     */
-    public static function singleton($class = null)
-    {
-        if (!$class) {
-            $class = get_called_class();
-        }
-
-        if (!isset(self::$singletons[$class])) {
-            self::$singletons[$class] = self::create($class);
-        }
-
-        return self::$singletons[$class];
-    }
-
-    /**
-     * Returns true if a class or interface name exists.
-     *
-     * @param string $class
-     *
-     * @return bool
-     */
-    public static function exists($class)
-    {
-        return (class_exists($class, false) || interface_exists($class, false));
-    }
-
-    /**
-     * This class allows you to overload classes with other classes when they
-     * are constructed using the factory method
-     * {@link ClassHelper::create()}
-     *
-     * @param string $oldClass the class to replace
-     * @param string $newClass the class to replace it with
-     * @param bool $force When true, the new class don't need to be a child
-     * class of the old
-     *
-     * @return bool Returns true, if everything was okay
-     */
-    public static function useOverwriteClass($oldClass, $newClass, $force = false)
-    {
-        if (self::exists($newClass)) {
-            if (($force) || (is_a(self::singleton($oldClass), $newClass))) {
-                self::$overwriteClasses[$oldClass] = $newClass;
-                return true;
-            } else {
-                return false;
-            }
-        } else {
-            return false;
-        }
-    }
-
-    /**
      * If a class has been overloaded, get the class name it has been
      * overloaded with - otherwise return the class name
      *
@@ -118,7 +118,7 @@ class ClassHelper
      * @return string the class that would be created if you called
      * {@link ClassHelper::create()} with the class
      */
-    public static function getOverwriteClass($class)
+    public static function getOverwriteClass($class): string
     {
         if (isset(self::$overwriteClasses[$class])) {
             return self::$overwriteClasses[$class];
@@ -141,7 +141,7 @@ class ClassHelper
      * @return mixed The value of the static property $name on class $class,
      * or $default if that property is not defined
      */
-    public static function static_lookup($class, $name, $default = null)
+    public static function staticLookup($class, $name, $default = null): mixed
     {
         $reflection = new ReflectionClass($class);
         $static_properties = $reflection->getStaticProperties();
@@ -170,7 +170,7 @@ class ClassHelper
      *
      * @return string this classes parent class
      */
-    public function parentClass()
+    public function parentClass(): mixed
     {
         return get_parent_class($this);
     }
@@ -183,7 +183,7 @@ class ClassHelper
      *
      * @return bool
      */
-    public function is_a($class)
+    public function isA($class): bool
     {
         return $this instanceof $class;
     }
@@ -193,7 +193,7 @@ class ClassHelper
      *
      * @return string the class name
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->class;
     }
@@ -203,7 +203,7 @@ class ClassHelper
      *
      * @return string the class name
      */
-    public function getClass()
+    public function getClass(): string
     {
         return get_class($this);
     }
