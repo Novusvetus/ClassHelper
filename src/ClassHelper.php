@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  * This file is part of ClassHelper.
@@ -20,6 +20,65 @@ class ClassHelper
 {
     private static $overwriteClasses = array();
     private static $singletons = array();
+
+    /**
+     * This class allows you to overload classes with other classes when they
+     * are constructed using the factory method
+     * {@link ClassHelper::create()}
+     *
+     * @param string $oldClass the class to replace
+     * @param string $newClass the class to replace it with
+     * @param bool $force When true, the new class don't need to be a child
+     * class of the old
+     *
+     * @return bool Returns true, if everything was okay
+     */
+    public static function useOverwriteClass($oldClass, $newClass, $force = false)
+    {
+        if (self::exists($newClass)) {
+            if (($force) || (is_a(self::singleton($oldClass), $newClass))) {
+                self::$overwriteClasses[$oldClass] = $newClass;
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Returns true if a class or interface name exists.
+     *
+     * @param string $class
+     *
+     * @return bool
+     */
+    public static function exists($class)
+    {
+        return (class_exists($class, false) || interface_exists($class, false));
+    }
+
+    /**
+     * Creates a class instance by the "singleton" design pattern.
+     * It will always return the same instance for this class.
+     *
+     * @param string $class Optional classname to create, if the called class should not be used
+     *
+     * @return static The singleton instance
+     */
+    public static function singleton($class = null)
+    {
+        if (!$class) {
+            $class = get_called_class();
+        }
+
+        if (!isset(self::$singletons[$class])) {
+            self::$singletons[$class] = self::create($class);
+        }
+
+        return self::$singletons[$class];
+    }
 
     /**
      * The factory method, allows you to create an instance of a class.
@@ -48,65 +107,6 @@ class ClassHelper
 
         $r = new ReflectionClass($class);
         return $r->newInstanceArgs($args);
-    }
-
-    /**
-     * Creates a class instance by the "singleton" design pattern.
-     * It will always return the same instance for this class.
-     *
-     * @param string $class Optional classname to create, if the called class should not be used
-     *
-     * @return static The singleton instance
-     */
-    public static function singleton($class = null)
-    {
-        if (!$class) {
-            $class = get_called_class();
-        }
-
-        if (!isset(self::$singletons[$class])) {
-            self::$singletons[$class] = self::create($class);
-        }
-
-        return self::$singletons[$class];
-    }
-
-    /**
-     * Returns true if a class or interface name exists.
-     *
-     * @param string $class
-     *
-     * @return bool
-     */
-    public static function exists($class)
-    {
-        return (class_exists($class, false) || interface_exists($class, false));
-    }
-
-    /**
-     * This class allows you to overload classes with other classes when they
-     * are constructed using the factory method
-     * {@link ClassHelper::create()}
-     *
-     * @param string $oldClass the class to replace
-     * @param string $newClass the class to replace it with
-     * @param bool $force When true, the new class don't need to be a child
-     * class of the old
-     *
-     * @return bool Returns true, if everything was okay
-     */
-    public static function useOverwriteClass($oldClass, $newClass, $force = false)
-    {
-        if (self::exists($newClass)) {
-            if (($force) || (is_a(self::singleton($oldClass), $newClass))) {
-                self::$overwriteClasses[$oldClass] = $newClass;
-                return true;
-            } else {
-                return false;
-            }
-        } else {
-            return false;
-        }
     }
 
     /**
