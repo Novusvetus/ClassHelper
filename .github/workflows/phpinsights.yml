@@ -1,0 +1,36 @@
+name: "CI"
+
+on:
+  push:
+    paths:
+      - "**.php"
+      - ".github/workflows/phpinsights.yml"
+  pull_request:
+    paths:
+      - "**.php"
+      - ".github/workflows/phpinsights.yml"
+
+jobs:
+  phpinsights:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0 # important!
+
+      - name: Install PHP Insights
+        run: |
+          curl -OL https://getcomposer.org/download/latest-2.x/composer.phar
+          php composer.phar global require nunomaduro/phpinsights
+          php composer.phar clearcache -q
+          php ~/.composer/vendor/bin/phpinsights --version
+
+      - uses: Novusvetus/action-phpinsights@1.1.0
+        with:
+          files: "**.php"
+          scan_all: true
+          phpinsights_path: "php ~/.composer/vendor/bin/phpinsights"
+          min_quality: 90
+          min_complexity: 90
+          min_architecture: 90
+          min_style: 90
