@@ -20,8 +20,14 @@ use ReflectionClass;
  */
 class ClassHelper
 {
-    private static $overwriteClasses = [];
-    private static $singletons = [];
+    /**
+     * @var array<string> $overwriteClasses
+     */
+    private static array $overwriteClasses = [];
+    /**
+     * @var array<object> $singletons
+     */
+    private static array $singletons = [];
 
     /**
      * The class name
@@ -45,8 +51,11 @@ class ClassHelper
      *
      * @return bool Returns true, if everything was okay
      */
-    public static function useOverwriteClass(string $oldClass, string $newClass, bool $force = false): bool
-    {
+    public static function useOverwriteClass(
+        string $oldClass,
+        string $newClass,
+        bool $force = false
+    ): bool {
         if (self::exists($newClass)) {
             if ($force || (is_a(self::singleton($oldClass), $newClass))) {
                 self::$overwriteClasses[$oldClass] = $newClass;
@@ -69,7 +78,8 @@ class ClassHelper
      * Creates a class instance by the "singleton" design pattern.
      * It will always return the same instance for this class.
      *
-     * @param string $class Optional classname to create, if the called class should not be used
+     * @param string $class Optional classname to create,
+     *     if the called class should not be used
      *
      * @return static The singleton instance
      */
@@ -98,7 +108,7 @@ class ClassHelper
      *
      * @return static
      */
-    public static function create(): ClassHelper
+    public static function create(): object
     {
         $args = func_get_args();
 
@@ -142,8 +152,11 @@ class ClassHelper
      * @return mixed The value of the static property $name on class $class,
      * or $default if that property is not defined
      */
-    public static function staticLookup(string $class, string $name, mixed $default = null): mixed
-    {
+    public static function staticLookup(
+        string $class,
+        string $name,
+        mixed $default = null
+    ): mixed {
         $reflection = new ReflectionClass($class);
         $static_properties = $reflection->getStaticProperties();
 
@@ -158,7 +171,10 @@ class ClassHelper
             $reflection = new ReflectionClass($parent);
             $static_properties = $reflection->getStaticProperties();
 
-            if (! isset($static_properties[$name]) || $static_properties[$name] !== $value) {
+            if (
+                ! isset($static_properties[$name]) ||
+                $static_properties[$name] !== $value
+            ) {
                 return $value;
             }
         }
