@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * This file is part of ClassHelper.
@@ -18,8 +20,24 @@ use ReflectionClass;
  */
 class ClassHelper
 {
-    private static $overwriteClasses = array();
-    private static $singletons = array();
+    /**
+     * @var array<string> $overwriteClasses
+     */
+    private static array $overwriteClasses = [];
+    /**
+     * @var array<object> $singletons
+     */
+    private static array $singletons = [];
+
+    /**
+     * The class name
+     *
+     * @return string the class name
+     */
+    public function __toString(): string
+    {
+        return $this->class;
+    }
 
     /**
      * This class allows you to overload classes with other classes when they
@@ -33,47 +51,45 @@ class ClassHelper
      *
      * @return bool Returns true, if everything was okay
      */
-    public static function useOverwriteClass($oldClass, $newClass, $force = false): bool
-    {
+    public static function useOverwriteClass(
+        string $oldClass,
+        string $newClass,
+        bool $force = false
+    ): bool {
         if (self::exists($newClass)) {
-            if (($force) || (is_a(self::singleton($oldClass), $newClass))) {
+            if ($force || (is_a(self::singleton($oldClass), $newClass))) {
                 self::$overwriteClasses[$oldClass] = $newClass;
                 return true;
-            } else {
-                return false;
             }
-        } else {
             return false;
         }
+        return false;
     }
 
     /**
      * Returns true if a class or interface name exists.
-     *
-     * @param string $class
-     *
-     * @return bool
      */
-    public static function exists($class): bool
+    public static function exists(string $class): bool
     {
-        return (class_exists($class, false) || interface_exists($class, false));
+        return class_exists($class, false) || interface_exists($class, false);
     }
 
     /**
      * Creates a class instance by the "singleton" design pattern.
      * It will always return the same instance for this class.
      *
-     * @param string $class Optional classname to create, if the called class should not be used
+     * @param string $class Optional classname to create,
+     *     if the called class should not be used
      *
      * @return static The singleton instance
      */
-    public static function singleton($class = null): ClassHelper
+    public static function singleton(?string $class = null): ClassHelper
     {
-        if (!$class) {
-            $class = get_called_class();
+        if (! $class) {
+            $class = static::class;
         }
 
-        if (!isset(self::$singletons[$class])) {
+        if (! isset(self::$singletons[$class])) {
             self::$singletons[$class] = self::create($class);
         }
 
@@ -92,21 +108,20 @@ class ClassHelper
      *
      * @return static
      */
-    public static function create(): ClassHelper
+    public static function create(): object
     {
         $args = func_get_args();
 
         // Class to create should be the calling class if not Object,
         // otherwise the first parameter
-        $class = get_called_class();
-        if ($class == 'Novusvetus\\ClassHelper\\ClassHelper') {
+        $class = static::class;
+        if ($class === 'Novusvetus\\ClassHelper\\ClassHelper') {
             $class = array_shift($args);
         }
 
         $class = self::getOverwriteClass($class);
 
-        $r = new ReflectionClass($class);
-        return $r->newInstanceArgs($args);
+        return (new ReflectionClass($class))->newInstanceArgs($args);
     }
 
     /**
@@ -118,13 +133,9 @@ class ClassHelper
      * @return string the class that would be created if you called
      * {@link ClassHelper::create()} with the class
      */
-    public static function getOverwriteClass($class): string
+    public static function getOverwriteClass(string $class): string
     {
-        if (isset(self::$overwriteClasses[$class])) {
-            return self::$overwriteClasses[$class];
-        }
-
-        return $class;
+        return self::$overwriteClasses[$class] ?? $class;
     }
 
     /**
@@ -141,8 +152,11 @@ class ClassHelper
      * @return mixed The value of the static property $name on class $class,
      * or $default if that property is not defined
      */
-    public static function staticLookup($class, $name, $default = null): mixed
-    {
+    public static function staticLookup(
+        string $class,
+        string $name,
+        mixed $default = null
+    ): mixed {
         $reflection = new ReflectionClass($class);
         $static_properties = $reflection->getStaticProperties();
 
@@ -150,14 +164,17 @@ class ClassHelper
             $value = $static_properties[$name];
 
             $parent = get_parent_class($class);
-            if (!$parent) {
+            if (! $parent) {
                 return $value;
             }
 
             $reflection = new ReflectionClass($parent);
             $static_properties = $reflection->getStaticProperties();
 
-            if (!isset($static_properties[$name]) || $static_properties[$name] !== $value) {
+            if (
+                ! isset($static_properties[$name]) ||
+                $static_properties[$name] !== $value
+            ) {
                 return $value;
             }
         }
@@ -178,12 +195,8 @@ class ClassHelper
     /**
      * Check if this class is an instance of a specific class, or has that
      * class as one of its parents
-     *
-     * @param string $class
-     *
-     * @return bool
      */
-    public function isA($class): bool
+    public function isA(string $class): bool
     {
         return $this instanceof $class;
     }
@@ -193,18 +206,8 @@ class ClassHelper
      *
      * @return string the class name
      */
-    public function __toString(): string
-    {
-        return $this->class;
-    }
-
-    /**
-     * The class name
-     *
-     * @return string the class name
-     */
     public function getClass(): string
     {
-        return get_class($this);
+        return static::class;
     }
 }
