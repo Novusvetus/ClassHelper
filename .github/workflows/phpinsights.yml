@@ -1,36 +1,30 @@
-name: "phpinsights"
-
-on:
+name: phpinsights
+'on':
   push:
     paths:
-      - "**.php"
-      - ".github/workflows/phpinsights.yml"
+      - '**.php'
+      - .github/workflows/phpinsights.yml
   pull_request:
     paths:
-      - "**.php"
-      - ".github/workflows/phpinsights.yml"
-
+      - '**.php'
+      - .github/workflows/phpinsights.yml
 jobs:
   phpinsights:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      -
+        uses: actions/checkout@v3
         with:
-          fetch-depth: 0 # important!
-
-      - name: Install PHP Insights
-        run: |
-          curl -OL https://getcomposer.org/download/latest-2.x/composer.phar
-          php composer.phar global config --no-plugins allow-plugins.dealerdirect/phpcodesniffer-composer-installer true
-          php composer.phar global require nunomaduro/phpinsights
-          php composer.phar clearcache -q
-          php ~/.composer/vendor/bin/phpinsights --version
-
-      - uses: Novusvetus/action-phpinsights@1.1.9
+          fetch-depth: 0
+      -
+        name: 'Install PHP Insights'
+        run: "curl -OL https://getcomposer.org/download/latest-2.x/composer.phar\nphp composer.phar global config --no-plugins allow-plugins.dealerdirect/phpcodesniffer-composer-installer true\nphp composer.phar global require nunomaduro/phpinsights\nphp composer.phar clearcache -q\nphp ~/.composer/vendor/bin/phpinsights --version\n"
+      -
+        uses: Novusvetus/action-phpinsights@1.1.10
         with:
-          files: "**.php"
+          files: '**.php'
           scan_all: true
-          phpinsights_path: "php ~/.composer/vendor/bin/phpinsights"
+          phpinsights_path: 'php ~/.composer/vendor/bin/phpinsights'
           min_quality: 90
           min_complexity: 90
           min_architecture: 90
