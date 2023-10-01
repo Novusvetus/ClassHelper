@@ -15,14 +15,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       -
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
       -
         name: 'Install PHP_CodeSniffer'
         run: "curl -OL https://squizlabs.github.io/PHP_CodeSniffer/phpcs.phar\nphp phpcs.phar --version\n"
       -
-        uses: Novusvetus/action-php_codesniffer@1.2.14
+        uses: Novusvetus/action-php_codesniffer@1.2.15
         with:
           files: '**.php'
           scan_all: true
