@@ -20,7 +20,7 @@ jobs:
         name: 'Install PHP Insights'
         run: "curl -OL https://getcomposer.org/download/latest-2.x/composer.phar\nphp composer.phar global config --no-plugins allow-plugins.dealerdirect/phpcodesniffer-composer-installer true\nphp composer.phar global require nunomaduro/phpinsights\nphp composer.phar clearcache -q\nphp ~/.composer/vendor/bin/phpinsights --version\n"
       -
-        uses: Novusvetus/action-phpinsights@1.1.15
+        uses: Novusvetus/action-phpinsights@1.1.16
         with:
           files: '**.php'
           scan_all: true
